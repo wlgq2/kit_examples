@@ -12,7 +12,7 @@ import "bytes"
 import "io/ioutil"
 
 type KeyValueService interface {
-	Set(string, string) error
+	Set(string, string) (string, error)
 	Get(string) (string, error)
 }
 
@@ -49,7 +49,7 @@ type KeyValueStruct struct {
 	Value string `json:"value"`
 }
 
-func makeSetEndpoint(service *MapService) endpoint.Endpoint {
+func makeSetEndpoint(service KeyValueService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(KeyValueStruct)
 		_, err := service.Set(req.Key, req.Value)
@@ -57,7 +57,7 @@ func makeSetEndpoint(service *MapService) endpoint.Endpoint {
 	}
 }
 
-func makeGetEndpoint(service *MapService) endpoint.Endpoint {
+func makeGetEndpoint(service KeyValueService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(KeyValueStruct)
 		return service.Get(req.Key)
