@@ -58,7 +58,8 @@ func makeSetEndpoint(service KeyValueService) endpoint.Endpoint {
 func makeGetEndpoint(service KeyValueService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
 		req := request.(KeyValueStruct)
-		return service.Get(req.Key)
+		value, err := service.Get(req.Key)
+		return KeyValueStruct{req.Key, value}, err
 	}
 }
 
