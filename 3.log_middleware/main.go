@@ -1,3 +1,10 @@
+/*
+   Copyright 2019, orcaer@yeah.net  All rights reserved.
+   Author: orcaer@yeah.net
+   Last modified: 2019-5-15
+   Description: https://github.com/wlgq2/kit_examples
+*/
+
 package main
 
 import (

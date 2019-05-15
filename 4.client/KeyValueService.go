@@ -8,9 +8,12 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/go-kit/kit/endpoint"
@@ -70,12 +73,30 @@ func makeGetEndpoint(service KeyValueService) endpoint.Endpoint {
 	}
 }
 
-func decodeStruct(_ context.Context, req *http.Request) (interface{}, error) {
+func decodeStructReq(_ context.Context, req *http.Request) (interface{}, error) {
 	var request KeyValueStruct
 	err := json.NewDecoder(req.Body).Decode(&request)
 	return request, err
 }
 
-func encodeStruct(_ context.Context, writer http.ResponseWriter, resp interface{}) error {
+func encodeStructResp(_ context.Context, writer http.ResponseWriter, resp interface{}) error {
 	return json.NewEncoder(writer).Encode(resp)
+}
+
+func encodeStructReq(_ context.Context, r *http.Request, request interface{}) error {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(request); err != nil {
+		return err
+	}
+	r.Body = ioutil.NopCloser(&buf)
+	return nil
+}
+
+func decodeStructResp(_ context.Context, r *http.Response) (interface{}, error) {
+	var response KeyValueStruct
+	fmt.Println(r.Body)
+	if err := json.NewDecoder(r.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+	return response, nil
 }
