@@ -32,8 +32,8 @@ func MakeSetClient(ctx context.Context, instance string) endpoint.Endpoint {
 	return httptransport.NewClient(
 		"GET",
 		u,
-		encodeStructReq,
-		decodeStructResp,
+		encodeReq,
+		decodeResp,
 	).Endpoint()
 }
 
@@ -51,7 +51,7 @@ func MakeGetClient(ctx context.Context, instance string) endpoint.Endpoint {
 	return httptransport.NewClient(
 		"GET",
 		u,
-		encodeStructReq,
-		decodeStructResp,
+		encodeReq,
+		decodeResp,
 	).Endpoint()
 }

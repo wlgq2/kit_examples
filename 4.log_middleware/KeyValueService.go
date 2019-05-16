@@ -82,7 +82,7 @@ func encodeResp(_ context.Context, writer http.ResponseWriter, resp interface{})
 	return json.NewEncoder(writer).Encode(resp)
 }
 
-func encodeStructReq(_ context.Context, r *http.Request, request interface{}) error {
+func encodeReq(_ context.Context, r *http.Request, request interface{}) error {
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(request); err != nil {
 		return err
@@ -91,7 +91,7 @@ func encodeStructReq(_ context.Context, r *http.Request, request interface{}) er
 	return nil
 }
 
-func decodeStructResp(_ context.Context, r *http.Response) (interface{}, error) {
+func decodeResp(_ context.Context, r *http.Response) (interface{}, error) {
 	var response KeyValueStruct
 	if err := json.NewDecoder(r.Body).Decode(&response); err != nil {
 		return nil, err
