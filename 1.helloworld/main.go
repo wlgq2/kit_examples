@@ -8,13 +8,9 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
-	"time"
 
 	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
@@ -23,27 +19,23 @@ import (
 type HelloService struct{}
 
 func (HelloService) hello(str string) (string, error) {
-	return str, nil
+	return "hello world!", nil
 }
 
-type StringRequest struct {
+type StringStruct struct {
 	Str string `json:"str"`
-}
-
-type StringResponse struct {
-	Hello string `json:"hello"`
 }
 
 func makeEndpoint(svc HelloService) endpoint.Endpoint {
 	return func(_ context.Context, request interface{}) (interface{}, error) {
-		req := request.(StringRequest)
+		req := request.(StringStruct)
 		v, err := svc.hello(req.Str)
-		return StringResponse{v}, err
+		return StringStruct{v}, err
 	}
 }
 
 func decodeRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request StringRequest
+	var request StringStruct
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -54,7 +46,8 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 	return json.NewEncoder(w).Encode(response)
 }
 
-func RunService() {
+func main() {
+
 	svc := HelloService{}
 
 	http.Handle("/string", httptransport.NewServer(
@@ -63,45 +56,4 @@ func RunService() {
 		encodeResponse))
 
 	http.ListenAndServe(":8080", nil)
-}
-
-func RunReq() {
-
-	time.Sleep(time.Duration(1) * time.Second)
-
-	url := "http://127.0.0.1:8080/string"
-	contentType := "application/json;charset=utf-8"
-
-	req := StringRequest{}
-	req.Str = "world!"
-	data, err := json.Marshal(req)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	body := bytes.NewBuffer(data)
-
-	resp, err := http.Post(url, contentType, body)
-
-	defer resp.Body.Close()
-
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	content, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	fmt.Println(string(content))
-}
-
-func main() {
-	go RunReq()
-
-	RunService()
 }
